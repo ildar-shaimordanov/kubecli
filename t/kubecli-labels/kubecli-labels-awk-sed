@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+kubecli-labels() {
+	kubecli get "$@" \
+	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
+	| awk '
+	NR == 1 {
+		header_names = $1
+		header_labels = $2
+	}
+
+	NR >= 2 {
+		# collect pod names into the associative array with the
+		# label names as keys of the array
+		for (n = 2; n <= NF; n++) {
+			s[$n] && s[$n] = s[$n] ","
+			s[$n] = s[$n] $1
+		}
+	}
+
+	END {
+		# find a length of the longest label
+		width = 0
+
+		for (p in s) {
+			len = length(p)
+			len > width && width = len
+		}
+
+		# prepare the format string
+		format = "%-" width "s  %s\n"
+
+		# final work: output labels and associated pods
+		printf format, header_labels, header_names
+
+		for (p in s) {
+			printf format, p, s[p]
+		}
+	}
+	' \
+	| sed 's/map\[//; s/\]//; s/:/=/g'
+}

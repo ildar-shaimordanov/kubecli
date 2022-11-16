@@ -1,0 +1,4 @@
+Collect all entities and labels and reorder according the labels:
+  kubecli labels NAME ...
+  kubectl get NAME \\
+    -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels

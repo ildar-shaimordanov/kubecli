@@ -1,0 +1,12 @@
+kubecli-internal-minus-minus-argument-position() {
+	[ $# -gt 0 ] || {
+		echo "1"
+		return
+	}
+
+	printf '%s\n' "$@" \
+	| awk '
+	p == 0 && /^--$/ { p = NR; exit }
+	END { p || p = NR + 1; print p }
+	'
+}

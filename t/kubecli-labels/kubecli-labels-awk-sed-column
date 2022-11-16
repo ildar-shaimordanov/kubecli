@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+kubecli-labels() {
+	kubecli get "$@" \
+	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
+	| awk '
+	NR == 1 { print $2, $1 }
+
+	NR >= 2 {
+		for (n = 2; n <= NF; n++) s[$n] = s[$n] "," $1
+	}
+
+	END {
+		for (p in s) print p, s[p]
+	}
+	' \
+	| sed 's/map\[//; s/\]//; s/:/=/; s/,//' \
+	| column -t
+}
