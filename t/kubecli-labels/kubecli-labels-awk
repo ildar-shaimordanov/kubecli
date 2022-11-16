@@ -10,7 +10,8 @@ kubecli-labels() {
 	}
 
 	NR >= 2 {
-		# prepare labels for usable form
+		# normalize labels: remove unused texts, convert to the
+		# usable form as "name=value"
 		sub(/map\[/, "")
 		sub(/]/, "")
 		gsub(/:/, "=")
@@ -32,10 +33,10 @@ kubecli-labels() {
 			len > width && width = len
 		}
 
-		# prepare the format string
+		# prepare the formatting string
 		format = "%-" width "s  %s\n"
 
-		# final work: output labels and associated pods
+		# final work: output the labels and associated pods
 		printf format, header_labels, header_names
 
 		for (p in s) {
