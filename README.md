@@ -128,7 +128,7 @@ Declares a namespace for invocation as `kubectl -n "$KUBECLI_NS"`.
 
 ## `KUBECLI_SEL`
 
-Declares a namespace for invocation as `kubectl -l "$KUBECLI_SEL" log`.
+Declares a selector for invocation as `kubectl logs -l "$KUBECLI_SEL"`.
 
 # ASSOCIATIONS AND CULTURAL REFERENCES
 
@@ -163,7 +163,7 @@ JSONPath Support
 
 # SEE ALSO
 
-This section is collection of links to other projects implementing something similar this or more interesting features.
+Here is collection of links to other projects similar to this one or implementing more interesting features.
 
 * https://github.com/deniskrumko/kube-cli/
 
