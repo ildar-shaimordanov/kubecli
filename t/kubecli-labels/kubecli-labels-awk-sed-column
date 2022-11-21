@@ -2,18 +2,23 @@
 
 kubecli-labels() {
 	kubecli get "$@" \
+	--no-headers \
 	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
+	| sed 's/map\[//; s/\]//; s/:/=/g' \
 	| awk '
-	NR == 1 { print $2, $1 }
-
-	NR >= 2 {
-		for (n = 2; n <= NF; n++) s[$n] = s[$n] "," $1
+	{
+		# collect pod names into the associative array with the
+		# label names as keys of the array
+		for (n = 2; n <= NF; n++) {
+			s[$n] && s[$n] = s[$n] ","
+			s[$n] = s[$n] $1
+		}
 	}
 
 	END {
+		# final work: output the labels and associated pods
 		for (p in s) print p, s[p]
 	}
 	' \
-	| sed 's/map\[//; s/\]//; s/:/=/; s/,//' \
 	| column -t
 }

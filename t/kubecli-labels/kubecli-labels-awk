@@ -2,18 +2,14 @@
 
 kubecli-labels() {
 	kubecli get "$@" \
+	--no-headers \
 	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
 	| awk '
-	NR == 1 {
-		header_names = $1
-		header_labels = $2
-	}
-
-	NR >= 2 {
+	{
 		# normalize labels: remove unused texts, convert to the
 		# usable form as "name=value"
 		sub(/map\[/, "")
-		sub(/]/, "")
+		sub(/\]/, "")
 		gsub(/:/, "=")
 
 		# collect pod names into the associative array with the
@@ -37,8 +33,6 @@ kubecli-labels() {
 		format = "%-" width "s  %s\n"
 
 		# final work: output the labels and associated pods
-		printf format, header_labels, header_names
-
 		for (p in s) {
 			printf format, p, s[p]
 		}
