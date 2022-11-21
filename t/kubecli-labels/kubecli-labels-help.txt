@@ -1,4 +1,4 @@
-Collect all entities and labels and reorder according the labels:
+Collect the entities and reorder against the labels they are associated:
   kubecli labels NAME ...
   kubectl get NAME \\
     --no-headers \\

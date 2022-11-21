@@ -1,16 +1,16 @@
 # +++
 # ## `labels`
 #
-# Collect all entities and labels and reorder according the labels:
+# Collect the entities and reorder against the labels they are associated:
 #
 #     kubecli labels NAME ...
 #     kubectl get NAME ... \
 #         --no-headers \
 #         -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 #
-# This command can be useful to recognize labels for selectors when needs come to define what are the pods for logging.
+# This command can be useful to recognize labels for selectors when needs come to define the pods for logging.
 #
-# Besides that the new command reorders the collected list against the labels associating pods and other entities with the labels.
+# Besides that this command reorders the collected list putting the labels in the front of the associated list of pods and other entities.
 #
 # ---
 
