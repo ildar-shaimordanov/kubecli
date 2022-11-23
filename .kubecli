@@ -112,7 +112,7 @@ To learn more about the kubectl usage
 #
 # ## `help`
 #
-# Print `kubecli` usage:
+# Print the `kubecli` short usage:
 #
 #     kubecli help
 #
@@ -122,8 +122,11 @@ kubecli-help() {
 	echo "\
 kubecli implements extended control over Kubernetes.
 
-Print kubecli usage
+Print the kubecli short usage:
   kubecli help
+
+Print the kubecli manual:
+  kubecli man
 
 Print Kubernetes related environment variables:
   kubecli env
@@ -167,7 +170,7 @@ Follow the next link to learn more about usage:
 # +++
 # ## `man`
 #
-# Print the manual:
+# Print the `kubecli` manual:
 #
 #     kubecli man
 #

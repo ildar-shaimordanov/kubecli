@@ -69,13 +69,13 @@ A command is passed as the first argument. If the argument is recognized as the 
 
 ## `help`
 
-Print `kubecli` usage:
+Print the `kubecli` short usage:
 
     kubecli help
 
 ## `man`
 
-Print the manual:
+Print the `kubecli` manual:
 
     kubecli man
 
