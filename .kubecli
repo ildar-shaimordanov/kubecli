@@ -381,7 +381,7 @@ __kubecli_minus_minus_argument_position() {
 # +++
 # # ENVIRONMENT
 #
-# These variables are used by `kubecli`. If one of them is declared and is not empty, it is used according to the explanations below.
+# These variables are used by `kubecli` and `kubectl`. If one of them is declared and is not empty, it is used according to the explanations below.
 #
 # ## `KUBECLI_GREP`
 #
@@ -397,7 +397,7 @@ __kubecli_minus_minus_argument_position() {
 #
 # ## `KUBECLI_SUDO`
 #
-# Declares the `sudo` command and its parameters used to elevate privileges for kubectl. It can be useful when the command is executed under regular users. No needs to declare it for root.
+# Declares the `sudo` command and its parameters used to elevate privileges for `kubectl`. It can be useful when the command is executed under regular users. No needs to declare it for root.
 #
 # At least one of the following examples is applicable for you:
 #
