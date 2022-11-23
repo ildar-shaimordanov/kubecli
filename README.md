@@ -155,6 +155,8 @@ At least one of the following examples is applicable for you:
     KUBECLI_SUDO=sudo
     KUBECLI_SUDO='sudo -i'
     KUBECLI_SUDO='sudo -E'
+    KUBECLI_SUDO='sudo -E bash -l'
+    KUBECLI_SUDO='sudo --preserve-env=KUBECONFIG'
     KUBECLI_SUDO='sudo KUBECONFIG=/etc/kubernetes/admin.conf'
 
 # ASSOCIATIONS AND CULTURAL REFERENCES
