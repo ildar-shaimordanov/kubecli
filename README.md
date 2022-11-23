@@ -9,14 +9,17 @@
   * [`kubecli`](#kubecli)
 * [COMMANDS](#commands)
   * [`help`](#help)
+  * [`man`](#man)
   * [`env`](#env)
   * [`names`](#names)
-  * [`find`](#find)
+  * [`labels`](#labels)
   * [`tail`](#tail)
   * [`grep`](#grep)
 * [ENVIRONMENT](#environment)
+  * [`KUBECLI_GREP`](#kubecli_grep)
   * [`KUBECLI_NS`](#kubecli_ns)
   * [`KUBECLI_SEL`](#kubecli_sel)
+  * [`KUBECLI_SUDO`](#kubecli_sudo)
 * [ASSOCIATIONS AND CULTURAL REFERENCES](#associations-and-cultural-references)
 * [REFERENCES](#references)
 * [SEE ALSO](#see-also)
@@ -41,6 +44,8 @@ The `kubecli` project implements the extended management on Kubernetes.
 * kubectl
 * bash
 * grep
+* awk
+* sed
 
 ## Installation
 
@@ -68,13 +73,19 @@ Print `kubecli` usage:
 
     kubecli help
 
+## `man`
+
+Print the manual:
+
+    kubecli man
+
 ## `env`
 
 Print Kubernetes related environment variables:
 
     kubecli env
 
-Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. Details are in the corresponding section below.
+Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. See the details in the corresponding section below.
 
 ## `names`
 
@@ -85,17 +96,18 @@ List the entity names only: any of namespaces, pods, etc:
 
 Two examples above show two options how to achieve the same result with the new function and in the classical way.
 
-## `find`
+## `labels`
 
-Find the required entities with names matching GREP-OPTIONS:
+Collect the entities and reorder them against the labels they associated:
 
-    kubecli find NAME ... -- GREP-OPTIONS
-    kubecli names NAME ... | grep GREP-OPTIONS
-    kubectl get NAME ... -o name | grep GREP-OPTIONS
+    kubecli labels NAME ...
+    kubectl get NAME ... \
+        --no-headers \
+        -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 
-In fact, the first command above is a light improvement for the second command. And in the same time it is syntactic sugar for the third classical command.
+This command can be useful to recognize labels for selectors when needs come to define the pods for logging.
 
-**Note**: the `--` parameter in the first command is mandatory because it separates arguments for `kubectl` and `grep`, respectively.
+Besides that this command reorders the collected list putting the labels in the front of the associated list of pods and other entities.
 
 ## `tail`
 
@@ -114,13 +126,17 @@ Print log lines matching GREP-OPTIONS:
     kubecli tail SELECTOR ... | grep GREP-OPTIONS
     kubectl logs SELECTOR ... | grep GREP-OPTIONS
 
-It's syntactic sugar for the previous command. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` in combination with alternative grep-like tools.
+It's syntactic sugar combining `kubecli tail` and `grep`. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
 
 **Note**: the `--` parameter in the first command is mandatory because it separates arguments for `kubectl` and `grep`, respectively.
 
 # ENVIRONMENT
 
 These variables are used by `kubecli`. If one of them is declared and is not empty, it is used according to the explanations below.
+
+## `KUBECLI_GREP`
+
+Enables an alternative command for filtering log lines. If not specified, `grep` is used.
 
 ## `KUBECLI_NS`
 
@@ -129,6 +145,17 @@ Declares a namespace for invocation as `kubectl -n "$KUBECLI_NS"`.
 ## `KUBECLI_SEL`
 
 Declares a selector for invocation as `kubectl logs -l "$KUBECLI_SEL"`.
+
+## `KUBECLI_SUDO`
+
+Declares the `sudo` command and its parameters used to elevate privileges for kubectl. It can be useful when the command is executed under regular users. No needs to declare it for root.
+
+At least one of the following examples is applicable for you:
+
+    KUBECLI_SUDO=sudo
+    KUBECLI_SUDO='sudo -i'
+    KUBECLI_SUDO='sudo -E'
+    KUBECLI_SUDO='sudo KUBECONFIG=/etc/kubernetes/admin.conf'
 
 # ASSOCIATIONS AND CULTURAL REFERENCES
 

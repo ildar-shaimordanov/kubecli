@@ -30,6 +30,8 @@
 # * kubectl
 # * bash
 # * grep
+# * awk
+# * sed
 #
 # ## Installation
 #
@@ -53,22 +55,22 @@
 if command -v kubectl >/dev/null
 then
 	kubectl() {
-		command kubectl "$@"
+		__kubecli_run_native command kubectl "$@"
 	}
 elif command -v minikube >/dev/null
 then
 	kubectl() {
-		minikube kubectl -- "$@"
+		__kubecli_run_native minikube kubectl -- "$@"
 	}
 elif command -v k3s >/dev/null
 then
 	kubectl() {
-		k3s kubectl "$@"
+		__kubecli_run_native k3s kubectl "$@"
 	}
 elif command -v rancher >/dev/null
 then
 	kubectl() {
-		rancher kubectl "$@"
+		__kubecli_run_native rancher kubectl "$@"
 	}
 fi
 
@@ -85,7 +87,16 @@ fi
 
 kubecli() {
 	case "$1" in
-	help | env | names | find | labels | tail | grep )
+	'' )
+		echo "\
+To learn more about this tool
+  kubecli help
+
+To learn more about the kubectl usage
+  kubecli --help
+"
+		;;
+	help | man | env | names | labels | tail | grep )
 		kubecli-"$@"
 		;;
 	* )
@@ -121,10 +132,11 @@ List the entity names only: any of namespaces, pods, etc:
   kubecli names NAME ...
   kubectl get NAME -o name ...
 
-Find the required entities with names matching GREP-OPTIONS:
-  kubecli find NAME ... -- GREP-OPTIONS
-  kubecli names NAME ... | grep GREP-OPTIONS
-  kubectl get NAME -o name ... | grep GREP-OPTIONS
+Collect the entities and them reorder against the labels they associated:
+  kubecli labels NAME ...
+  kubectl get NAME \\
+    --no-headers \\
+    -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 
 Display logs for selected entities:
   kubecli tail SELECTOR ...
@@ -142,10 +154,31 @@ Execute arbitrary kubectl command:
 Environment variables. If set, have impact as follows:
   KUBECLI_NS   kubectl -n \"\$KUBECLI_NS\" ...
   KUBECLI_SEL  kubectl -l \"\$KUBECLI_SEL\" ...
+  KUBECLI_SUDO sudo ... kubectl ...
+  KUBECLI_GREP kubecli grep ...
 
 Follow the next link to learn more about usage:
   https://github.com/ildar-shaimordanov/kubecli
 "
+}
+
+# =========================================================================
+
+# +++
+# ## `man`
+#
+# Print the manual:
+#
+#     kubecli man
+#
+# ---
+
+kubecli-man() {
+	sed -n '/^# [+][+][+]$/,/^# [-][-][-]$/ {
+		/^# [+][+][+]$/d
+		/^# [-][-][-]$/d
+		s/^# \?//p
+	}' < "$BASH_SOURCE"
 }
 
 # =========================================================================
@@ -157,7 +190,7 @@ Follow the next link to learn more about usage:
 #
 #     kubecli env
 #
-# Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. Details are in the corresponding section below.
+# Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. See the details in the corresponding section below.
 #
 # ---
 
@@ -188,24 +221,61 @@ kubecli-names() {
 # =========================================================================
 
 # +++
-# ## `find`
+# ## `labels`
 #
-# Find the required entities with names matching GREP-OPTIONS:
+# Collect the entities and reorder them against the labels they associated:
 #
-#     kubecli find NAME ... -- GREP-OPTIONS
-#     kubecli names NAME ... | grep GREP-OPTIONS
-#     kubectl get NAME ... -o name | grep GREP-OPTIONS
+#     kubecli labels NAME ...
+#     kubectl get NAME ... \
+#         --no-headers \
+#         -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 #
-# In fact, the first command above is a light improvement for the second command. And in the same time it is syntactic sugar for the third classical command.
+# This command can be useful to recognize labels for selectors when needs come to define the pods for logging.
 #
-# **Note**: the `--` parameter in the first command is mandatory because it separates arguments for `kubectl` and `grep`, respectively.
+# Besides that this command reorders the collected list putting the labels in the front of the associated list of pods and other entities.
 #
 # ---
 
-kubecli-find() {
-	local n
-	n="$( kubecli-internal-minus-minus-argument-position "$@" )"
-	kubecli-names "${@:1:n-1}" | grep "${@:n+1}"
+# Pass the arguments exactly in this order to prevent on overwriting our
+# mandatory options by end users when they try to pass something another.
+kubecli-labels() {
+	kubecli get "$@" \
+	--no-headers \
+	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
+	| awk '
+	{
+		# normalize labels: remove unused texts, convert to the
+		# usable form as "name=value"
+		sub(/map\[/, "")
+		sub(/\]/, "")
+		gsub(/:/, "=")
+
+		# collect pod names into the associative array with the
+		# label names as keys of the array
+		for (n = 2; n <= NF; n++) {
+			s[$n] && s[$n] = s[$n] ","
+			s[$n] = s[$n] $1
+		}
+	}
+
+	END {
+		# find a length of the longest label
+		width = 0
+
+		for (p in s) {
+			len = length(p)
+			len > width && width = len
+		}
+
+		# prepare the formatting string
+		format = "%-" width "s  %s\n"
+
+		# final work: output the labels and associated pods
+		for (p in s) {
+			printf format, p, s[p]
+		}
+	}
+	'
 }
 
 # =========================================================================
@@ -237,7 +307,7 @@ kubecli-tail() {
 #     kubecli tail SELECTOR ... | grep GREP-OPTIONS
 #     kubectl logs SELECTOR ... | grep GREP-OPTIONS
 #
-# It's syntactic sugar for the previous command. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` in combination with alternative grep-like tools.
+# It's syntactic sugar combining `kubecli tail` and `grep`. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
 #
 # **Note**: the `--` parameter in the first command is mandatory because it separates arguments for `kubectl` and `grep`, respectively.
 #
@@ -245,14 +315,53 @@ kubecli-tail() {
 
 kubecli-grep() {
 	local n
-	n="$( kubecli-internal-minus-minus-argument-position "$@" )"
-	kubecli-tail "${@:1:n-1}" | grep "${@:n+1}"
+	n="$( __kubecli_minus_minus_argument_position "$@" )"
+	kubecli-tail "${@:1:n-1}" \
+	| eval "${KUBECLI_GREP:-grep} $(
+		__kubecli_reparse_arguments "${@:n+1}"
+	)"
 }
 
 # =========================================================================
 
-# It's function internally used to detect the position of the first "--".
-kubecli-internal-minus-minus-argument-position() {
+# Reparse arguments for using with eval.
+
+__kubecli_reparse_arguments() {
+	for n in "$@" ; do printf " '%s'" "${n//\'/\'\\\'\'}" ; done
+}
+
+# Construct the command line and run the native kubectl instance. Before
+# running the final command, it checks correctness of sudo-ing and fix
+# the arguments list removing the first argument if it equals exactly
+# to the value "command", which is the shell builtin command.
+
+__kubecli_run_native() {
+	if [ -n "$KUBECLI_SUDO" ]
+	then
+		case "$KUBECLI_SUDO" in
+		sudo | 'sudo '* )
+			# Everything is fine - do nothing.
+			;;
+		* )
+			echo "KUBECLI_SUDO is not set correctly">&2
+			return 1
+			;;
+		esac
+
+		if [ "$1" = "command" ]
+		then
+			shift
+		fi
+	fi
+
+	eval "$KUBECLI_SUDO $(
+		__kubecli_reparse_arguments "$@"
+	)"
+}
+
+# Detect and print the position of the first "--" occurrence.
+
+__kubecli_minus_minus_argument_position() {
 	local n=1
 
 	while [ $# -gt 0 ] && [ "$1" != "--" ] || break
@@ -271,6 +380,10 @@ kubecli-internal-minus-minus-argument-position() {
 #
 # These variables are used by `kubecli`. If one of them is declared and is not empty, it is used according to the explanations below.
 #
+# ## `KUBECLI_GREP`
+#
+# Enables an alternative command for filtering log lines. If not specified, `grep` is used.
+#
 # ## `KUBECLI_NS`
 #
 # Declares a namespace for invocation as `kubectl -n "$KUBECLI_NS"`.
@@ -278,6 +391,17 @@ kubecli-internal-minus-minus-argument-position() {
 # ## `KUBECLI_SEL`
 #
 # Declares a selector for invocation as `kubectl logs -l "$KUBECLI_SEL"`.
+#
+# ## `KUBECLI_SUDO`
+#
+# Declares the `sudo` command and its parameters used to elevate privileges for kubectl. It can be useful when the command is executed under regular users. No needs to declare it for root.
+#
+# At least one of the following examples is applicable for you:
+#
+#     KUBECLI_SUDO=sudo
+#     KUBECLI_SUDO='sudo -i'
+#     KUBECLI_SUDO='sudo -E'
+#     KUBECLI_SUDO='sudo KUBECONFIG=/etc/kubernetes/admin.conf'
 #
 # # ASSOCIATIONS AND CULTURAL REFERENCES
 #
