@@ -9,7 +9,6 @@
   * [`kubecli`](#kubecli)
 * [COMMANDS](#commands)
   * [`help`](#help)
-  * [`man`](#man)
   * [`env`](#env)
   * [`names`](#names)
   * [`labels`](#labels)
@@ -73,17 +72,11 @@ Print the `kubecli` short usage:
 
     kubecli help
 
-## `man`
-
-Print the `kubecli` manual:
-
-    kubecli man
-
 ## `env`
 
-Print Kubernetes related environment variables:
+Print any kubernetes related variables or set some of kubecli specific:
 
-    kubecli env
+    kubecli env [-n NAMESPACE] [-l SELECTOR]
 
 Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. See the details in the corresponding section below.
 
@@ -113,7 +106,7 @@ Besides that this command reorders the collected list putting the labels in the 
 
 Display logs for selected entities:
 
-    kubecli tail SELECTOR ...
+    kubecli tail [SELECTOR] ...
     kubectl logs SELECTOR ...
 
 It's definitely something very useful: keep a namespace and pod selectors in environment variables and call a command like this to monitor pods' log messages.
@@ -122,8 +115,8 @@ It's definitely something very useful: keep a namespace and pod selectors in env
 
 Print log lines matching GREP-OPTIONS:
 
-    kubecli grep SELECTOR ... -- GREP-OPTIONS
-    kubecli tail SELECTOR ... | grep GREP-OPTIONS
+    kubecli grep [SELECTOR] ... -- GREP-OPTIONS
+    kubecli tail [SELECTOR] ... | grep GREP-OPTIONS
     kubectl logs SELECTOR ... | grep GREP-OPTIONS
 
 It's syntactic sugar combining `kubecli tail` and `grep`. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
@@ -150,7 +143,7 @@ Declares a selector for invocation as `kubectl logs -l "$KUBECLI_SEL"`.
 
 Declares the `sudo` command and its parameters used to elevate privileges for `kubectl`. It can be useful when the command is executed under regular users. No needs to declare it for root.
 
-At least one of the following examples is applicable for you:
+At least one of the following examples is applicable for you (just specify the right path to the configuration file):
 
     KUBECLI_SUDO=sudo
     KUBECLI_SUDO='sudo -i'
@@ -194,7 +187,8 @@ JSONPath Support
 
 Here is collection of links to other projects similar to this one or implementing more interesting features.
 
-* https://github.com/deniskrumko/kube-cli/
+* https://github.com/deniskrumko/kube-cli
+* https://github.com/ahmetb/kubectx
 
 # LICENSE
 

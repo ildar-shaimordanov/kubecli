@@ -96,8 +96,10 @@ To learn more about the kubectl usage
   kubecli --help
 "
 		;;
-	help | man | env | names | labels | tail | grep )
-		kubecli-"$@"
+	help | env | names | labels | tail | grep )
+		# pass array as array as kubecli_$1 "${@:2}"
+		# shellcheck disable=SC2145
+		kubecli_"$@"
 		;;
 	* )
 		kubectl ${KUBECLI_NS:+-n "$KUBECLI_NS"} "$@"
@@ -118,18 +120,15 @@ To learn more about the kubectl usage
 #
 # ---
 
-kubecli-help() {
+kubecli_help() {
 	echo "\
 kubecli implements extended control over Kubernetes.
 
 Print the kubecli short usage:
   kubecli help
 
-Print the kubecli manual:
-  kubecli man
-
-Print Kubernetes related environment variables:
-  kubecli env
+Print any kubernetes related variables or set some of kubecli specific:
+  kubecli env [-n NAMESPACE] [-l SELECTOR]
 
 List the entity names only: any of namespaces, pods, etc:
   kubecli names NAME ...
@@ -137,17 +136,17 @@ List the entity names only: any of namespaces, pods, etc:
 
 Collect the entities and them reorder against the labels they associated:
   kubecli labels NAME ...
-  kubectl get NAME \\
+  kubectl get NAME ... \\
     --no-headers \\
     -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 
 Display logs for selected entities:
-  kubecli tail SELECTOR ...
+  kubecli tail [SELECTOR] ...
   kubectl logs SELECTOR ...
 
 Print log lines matching GREP-OPTIONS:
-  kubecli grep SELECTOR ... -- GREP-OPTIONS
-  kubecli tail SELECTOR ... | grep GREP-OPTIONS
+  kubecli grep [SELECTOR] ... -- GREP-OPTIONS
+  kubecli tail [SELECTOR] ... | grep GREP-OPTIONS
   kubectl logs SELECTOR ... | grep GREP-OPTIONS
 
 Execute arbitrary kubectl command:
@@ -168,37 +167,31 @@ Follow the next link to learn more about usage:
 # =========================================================================
 
 # +++
-# ## `man`
-#
-# Print the `kubecli` manual:
-#
-#     kubecli man
-#
-# ---
-
-kubecli-man() {
-	sed -n '/^# [+][+][+]$/,/^# [-][-][-]$/ {
-		/^# [+][+][+]$/d
-		/^# [-][-][-]$/d
-		s/^# \?//p
-	}' < "$BASH_SOURCE"
-}
-
-# =========================================================================
-
-# +++
 # ## `env`
 #
-# Print Kubernetes related environment variables:
+# Print any kubernetes related variables or set some of kubecli specific:
 #
-#     kubecli env
+#     kubecli env [-n NAMESPACE] [-l SELECTOR]
 #
 # Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. See the details in the corresponding section below.
 #
 # ---
 
-kubecli-env() {
-	set | grep '^KUBE[^=]*'
+kubecli_env() {
+	[ $# -gt 0 ] || {
+		set | grep '^KUBE[^=]*'
+		return 0
+	}
+
+	local opt
+	while getopts "n:l:" opt
+	do
+		case "$opt" in
+		n ) KUBECLI_NS="$OPTARG" ;;
+		l ) KUBECLI_SEL="$OPTARG" ;;
+		* ) echo "Unrecognized error">&2
+		esac
+	done
 }
 
 # =========================================================================
@@ -217,7 +210,7 @@ kubecli-env() {
 
 # Pass the arguments exactly in this order to prevent on overwriting our
 # mandatory options by end users when they try to pass something another.
-kubecli-names() {
+kubecli_names() {
 	kubecli get "$@" -o name
 }
 
@@ -241,7 +234,7 @@ kubecli-names() {
 
 # Pass the arguments exactly in this order to prevent on overwriting our
 # mandatory options by end users when they try to pass something another.
-kubecli-labels() {
+kubecli_labels() {
 	kubecli get "$@" \
 	--no-headers \
 	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
@@ -288,14 +281,14 @@ kubecli-labels() {
 #
 # Display logs for selected entities:
 #
-#     kubecli tail SELECTOR ...
+#     kubecli tail [SELECTOR] ...
 #     kubectl logs SELECTOR ...
 #
 # It's definitely something very useful: keep a namespace and pod selectors in environment variables and call a command like this to monitor pods' log messages.
 #
 # ---
 
-kubecli-tail() {
+kubecli_tail() {
 	kubecli logs ${KUBECLI_SEL:+-l "$KUBECLI_SEL"} "$@"
 }
 
@@ -306,8 +299,8 @@ kubecli-tail() {
 #
 # Print log lines matching GREP-OPTIONS:
 #
-#     kubecli grep SELECTOR ... -- GREP-OPTIONS
-#     kubecli tail SELECTOR ... | grep GREP-OPTIONS
+#     kubecli grep [SELECTOR] ... -- GREP-OPTIONS
+#     kubecli tail [SELECTOR] ... | grep GREP-OPTIONS
 #     kubectl logs SELECTOR ... | grep GREP-OPTIONS
 #
 # It's syntactic sugar combining `kubecli tail` and `grep`. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
@@ -316,10 +309,10 @@ kubecli-tail() {
 #
 # ---
 
-kubecli-grep() {
+kubecli_grep() {
 	local n
 	n="$( __kubecli_minus_minus_argument_position "$@" )"
-	kubecli-tail "${@:1:n-1}" \
+	kubecli_tail "${@:1:n-1}" \
 	| eval "${KUBECLI_GREP:-grep} $(
 		__kubecli_reparse_arguments "${@:n+1}"
 	)"
@@ -369,7 +362,7 @@ __kubecli_minus_minus_argument_position() {
 
 	while [ $# -gt 0 ] && [ "$1" != "--" ] || break
 	do
-		(( n+=1 ))
+		n=$(( n+1 ))
 		shift
 	done
 
@@ -399,7 +392,7 @@ __kubecli_minus_minus_argument_position() {
 #
 # Declares the `sudo` command and its parameters used to elevate privileges for `kubectl`. It can be useful when the command is executed under regular users. No needs to declare it for root.
 #
-# At least one of the following examples is applicable for you:
+# At least one of the following examples is applicable for you (just specify the right path to the configuration file):
 #
 #     KUBECLI_SUDO=sudo
 #     KUBECLI_SUDO='sudo -i'
@@ -443,7 +436,8 @@ __kubecli_minus_minus_argument_position() {
 #
 # Here is collection of links to other projects similar to this one or implementing more interesting features.
 #
-# * https://github.com/deniskrumko/kube-cli/
+# * https://github.com/deniskrumko/kube-cli
+# * https://github.com/ahmetb/kubectx
 #
 # # LICENSE
 #
