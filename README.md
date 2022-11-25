@@ -25,14 +25,15 @@
 * [LICENSE](#license)
 <!-- toc-end -->
 
+
 # NAME
 
 `kubecli` - extended control over Kubernetes
 
 # SYNOPSIS
 
-    kubecli ...
-    kubectl ...
+    kubecli [OPTIONS]
+    kubectl [OPTIONS]
 
 # DESCRIPTION
 
@@ -52,17 +53,20 @@ Download the `.kubecli` file from this repository and put it in the home directo
 
     . ~/.kubecli
 
+
 ## `kubectl`
 
 It's wrapper function around the `kubectl` executable itself and possibly other launchers like `minikube kubectl`, `k3s kubectl` and `rancher kubectl`.
 
 Other forms have been taken into account also because they are mentioned in the official documentations of each distribution.
 
+
 ## `kubecli`
 
 It's the real workhorse. It does everything what `kubectl` is able to do and also does a bit more. The following section describes extended commands supported by `kubecli`.
 
 A command is passed as the first argument. If the argument is recognized as the `kubecli` extended command, it is processed internally. Otherwise everything is passed to `kubectl`.
+
 
 # COMMANDS
 
@@ -72,29 +76,32 @@ Print the `kubecli` short usage:
 
     kubecli help
 
+
 ## `env`
 
 Print any kubernetes related variables or set some of kubecli specific:
 
     kubecli env [-n NAMESPACE] [-l SELECTOR]
 
-Kubernetes itself uses some environment variables which names look like `KUBE*`. This project adds a few variables named as `KUBECLI_*`. See the details in the corresponding section below.
+Kubernetes itself uses some environment variables which names look like `KUBE*`. This project also adds a few variables named as `KUBECLI_*`. See the details in the corresponding section below.
+
 
 ## `names`
 
 List the entity names only: any of namespaces, pods, etc:
 
-    kubecli names NAME ...
-    kubectl get NAME ... -o name
+    kubecli names NAME [OPTIONS]
+    kubectl get NAME [OPTIONS] -o name
 
 Two examples above show two options how to achieve the same result with the new function and in the classical way.
+
 
 ## `labels`
 
 Collect the entities and reorder them against the labels they associated:
 
-    kubecli labels NAME ...
-    kubectl get NAME ... \
+    kubecli labels NAME [OPTIONS]
+    kubectl get NAME [OPTIONS] \
         --no-headers \
         -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 
@@ -102,26 +109,31 @@ This command can be useful to recognize labels for selectors when needs come to 
 
 Besides that this command reorders the collected list putting the labels in the front of the associated list of pods and other entities.
 
+
 ## `tail`
 
 Display logs for selected entities:
 
-    kubecli tail [SELECTOR] ...
-    kubectl logs SELECTOR ...
+    kubecli tail [SELECTOR] [OPTIONS]
+    kubectl logs SELECTOR [OPTIONS]
 
-It's definitely something very useful: keep a namespace and pod selectors in environment variables and call a command like this to monitor pods' log messages.
+It's definitely something useful: keep a namespace and pod selectors in `KUBECLI_NS` and `KUBECLI_SEL`, the environment variables and call this command to monitor pods' log messages.
+
 
 ## `grep`
 
 Print log lines matching GREP-OPTIONS:
 
-    kubecli grep [SELECTOR] ... -- GREP-OPTIONS
-    kubecli tail [SELECTOR] ... | grep GREP-OPTIONS
-    kubectl logs SELECTOR ... | grep GREP-OPTIONS
+    kubecli grep [SELECTOR] [OPTIONS] -- GREP-OPTIONS
+    kubecli tail [SELECTOR] [OPTIONS] | grep GREP-OPTIONS
+    kubectl logs SELECTOR [OPTIONS] | grep GREP-OPTIONS
 
-It's syntactic sugar combining `kubecli tail` and `grep`. More frequently we need to filter some particular lines in logs. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
+Take logs of pods specified by the selector and filter particular lines. If the `KUBECLI_SELECTOR` variable is set and not empty, it is used implicitly.
+
+It's syntactic sugar combining `kubecli tail` and `grep`. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
 
 **Note**: the `--` parameter in the first command is mandatory because it separates arguments for `kubectl` and `grep`, respectively.
+
 
 # ENVIRONMENT
 
@@ -141,7 +153,7 @@ Declares a selector for invocation as `kubectl logs -l "$KUBECLI_SEL"`.
 
 ## `KUBECLI_SUDO`
 
-Declares the `sudo` command and its parameters used to elevate privileges for `kubectl`. It can be useful when the command is executed under regular users. No needs to declare it for root.
+If required, declares the `sudo` command and optionally its parameters used to elevate privileges for `kubectl`. It can be useful when the command is executed under regular users. No needs to declare it for root.
 
 At least one of the following examples is applicable for you (just specify the right path to the configuration file):
 
@@ -160,7 +172,7 @@ Events take place partially on our Earth and mostly on Plyuk, the alien planet. 
 
 Later I realized that kubecli is good name for the project because it is CLI tool for kube (the short form of kubectl). In the other hand, kubecli /kubekli/ sounds almost like күбәләк /kʏbæ'læk/, the Tatar word meaning butterfly.
 
-When development was becoming closer to finish and was almost ready for publishing I re-read some facts about "Kin-dza-dza!". Another Plyukanian word pepelats (a spaceship) is originated from the Georgian word პეპელა /'pepela/ that is translated as butterfly.
+When development became closer to finish and was almost ready for publishing I re-read some facts about "Kin-dza-dza!". Pepelats, another Plyukanian word meaning a spaceship is originated from the Georgian word პეპელა /'pepela/ that is translated as butterfly.
 
 So, the circle has closed! Koo!
 
@@ -195,3 +207,4 @@ Here is collection of links to other projects similar to this one or implementin
 Copyright 2022, Ildar Shaimordanov
 
     MIT License
+
