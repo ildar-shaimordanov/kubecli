@@ -201,6 +201,7 @@ Here is collection of links to other projects similar to this one or implementin
 
 * https://github.com/deniskrumko/kube-cli
 * https://github.com/ahmetb/kubectx
+* https://github.com/collabnix/kubetools
 
 # LICENSE
 

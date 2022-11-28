@@ -93,14 +93,14 @@ kubecli() {
 	'' )
 		echo "\
 To learn more about this tool
-  kubecli help
+    kubecli help
 
 To learn more about the kubectl usage
-  kubecli --help
+    kubecli --help
 "
 		;;
 	help | env | names | labels | tail | grep )
-		# pass array as array as kubecli_$1 "${@:2}"
+		# pass array as array slimilar to kubecli_$1 "${@:2}"
 		# shellcheck disable=SC2145
 		kubecli_"$@"
 		;;
@@ -217,7 +217,7 @@ kubecli_env() {
 # Pass the arguments exactly in this order to prevent on overwriting our
 # mandatory options by end users when they try to pass something another.
 kubecli_names() {
-	kubecli get "$@" -o name
+	kubectl get "$@" -o name
 }
 
 # =========================================================================
@@ -243,7 +243,7 @@ kubecli_names() {
 # mandatory options by end users when they try to pass something another.
 
 kubecli_labels() {
-	kubecli get "$@" \
+	kubectl get "$@" \
 	--no-headers \
 	-o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels \
 	| awk '
@@ -298,7 +298,7 @@ kubecli_labels() {
 # ---
 
 kubecli_tail() {
-	kubecli logs ${KUBECLI_SEL:+-l "$KUBECLI_SEL"} "$@"
+	kubectl logs ${KUBECLI_SEL:+-l "$KUBECLI_SEL"} "$@"
 }
 
 # =========================================================================
@@ -451,6 +451,7 @@ __kubecli_minus_minus_argument_position() {
 #
 # * https://github.com/deniskrumko/kube-cli
 # * https://github.com/ahmetb/kubectx
+# * https://github.com/collabnix/kubetools
 #
 # # LICENSE
 #
