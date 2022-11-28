@@ -313,7 +313,7 @@ kubecli_tail() {
 #     kubecli tail [SELECTOR] [OPTIONS] | grep GREP-OPTIONS
 #     kubectl logs SELECTOR [OPTIONS] | grep GREP-OPTIONS
 #
-# Take logs of pods specified by the selector and filter particular lines. If the `KUBECLI_SELECTOR` variable is set and not empty, it is used implicitly.
+# Take logs of pods specified by the selector and filter particular lines. If the `KUBECLI_SEL` variable is set and not empty, it is used implicitly.
 #
 # It's syntactic sugar combining `kubecli tail` and `grep`. For more complex cases use `kubecli tail` with alternative grep-like tools or specify the `KUBECLI_GREP` variable.
 #
