@@ -57,22 +57,22 @@
 if command -v kubectl >/dev/null
 then
 	kubectl() {
-		__kubecli_run_native command kubectl "$@"
+		__kubecli_run_kubectl command kubectl "$@"
 	}
 elif command -v minikube >/dev/null
 then
 	kubectl() {
-		__kubecli_run_native minikube kubectl -- "$@"
+		__kubecli_run_kubectl minikube kubectl -- "$@"
 	}
 elif command -v k3s >/dev/null
 then
 	kubectl() {
-		__kubecli_run_native k3s kubectl "$@"
+		__kubecli_run_kubectl k3s kubectl "$@"
 	}
 elif command -v rancher >/dev/null
 then
 	kubectl() {
-		__kubecli_run_native rancher kubectl "$@"
+		__kubecli_run_kubectl rancher kubectl "$@"
 	}
 fi
 
@@ -189,12 +189,13 @@ kubecli_env() {
 	}
 
 	local opt
-	while getopts "n:l:" opt
+	while getopts ":n:l:" opt
 	do
 		case "$opt" in
 		n ) KUBECLI_NS="$OPTARG" ;;
 		l ) KUBECLI_SEL="$OPTARG" ;;
-		* ) echo "Unrecognized error">&2
+		: ) echo "Argument required: -$OPTARG" >&2 ;;
+		? ) echo "Illegal option: -$OPTARG" >&2 ;;
 		esac
 	done
 }
@@ -216,6 +217,7 @@ kubecli_env() {
 
 # Pass the arguments exactly in this order to prevent on overwriting our
 # mandatory options by end users when they try to pass something another.
+
 kubecli_names() {
 	kubectl get "$@" -o name
 }
@@ -343,7 +345,7 @@ __kubecli_reparse_arguments() {
 # the arguments list removing the first argument if it equals exactly
 # to the value "command", which is the shell builtin command.
 
-__kubecli_run_native() {
+__kubecli_run_kubectl() {
 	if [ -n "$KUBECLI_SUDO" ]
 	then
 		case "$KUBECLI_SUDO" in
