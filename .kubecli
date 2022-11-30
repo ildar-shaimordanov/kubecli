@@ -359,7 +359,8 @@ kubecli_grep() {
 # Reparse arguments for using with eval.
 
 __kubecli_reparse_arguments() {
-	for n in "$@" ; do printf " '%s'" "${n//\'/\'\\\'\'}" ; done
+	[ $# -gt 0 ] || return
+	printf " '%s'" "${@//\'/\'\\\'\'}"
 }
 
 # Construct the command line and run the native kubectl instance. Before
@@ -368,23 +369,21 @@ __kubecli_reparse_arguments() {
 # to the value "command", which is the shell builtin command.
 
 __kubecli_run_kubectl() {
-	if [ -n "$KUBECLI_SUDO" ]
-	then
-		case "$KUBECLI_SUDO" in
-		sudo | 'sudo '* )
-			# Everything is fine - do nothing.
-			;;
-		* )
-			echo "KUBECLI_SUDO is not set correctly">&2
-			return 1
-			;;
-		esac
-
+	case "$KUBECLI_SUDO" in
+	'' )
+		# No sudo - nothing to do.
+		;;
+	sudo | 'sudo '* )
 		if [ "$1" = "command" ]
 		then
 			shift
 		fi
-	fi
+		;;
+	* )
+		echo "KUBECLI_SUDO is not set correctly">&2
+		return 1
+		;;
+	esac
 
 	eval "$KUBECLI_SUDO $(
 		__kubecli_reparse_arguments "$@"
