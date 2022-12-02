@@ -274,7 +274,7 @@ kubecli_labels() {
 		# collect pod names into the associative array with the
 		# label names as keys of the array
 		for (n = 2; n <= NF; n++) {
-			s[$n] && s[$n] = s[$n] ","
+			if ( s[$n] ) s[$n] = s[$n] ","
 			s[$n] = s[$n] $1
 		}
 	}
@@ -285,16 +285,14 @@ kubecli_labels() {
 
 		for (p in s) {
 			len = length(p)
-			len > width && width = len
+			if ( len > width ) width = len
 		}
 
 		# prepare the formatting string
 		format = "%-" width "s  %s\n"
 
 		# final work: output the labels and associated pods
-		for (p in s) {
-			printf format, p, s[p]
-		}
+		for (p in s) printf format, p, s[p]
 	}
 	'
 }
