@@ -156,6 +156,8 @@ specify the `KUBECLI_GREP` variable.
 **Note**: the `--` parameter in the first command is mandatory because
 it separates arguments for `kubectl` and `grep`, respectively.
 
+**Note**: this command is fully supported in BASH only.
+
 
 # ENVIRONMENT
 
