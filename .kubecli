@@ -81,6 +81,33 @@ then
 	}
 fi
 
+# Construct the command line and run the native kubectl instance. Before
+# running the final command, it checks correctness of sudo-ing and fix
+# the arguments list removing the first argument if it equals exactly
+# to the value "command", which is the shell builtin command.
+
+__kubecli_run_kubectl() {
+	case "$KUBECLI_SUDO" in
+	'' )
+		# No sudo - nothing to do.
+		;;
+	sudo | 'sudo '* )
+		if [ "$1" = "command" ]
+		then
+			shift
+		fi
+		;;
+	* )
+		echo "KUBECLI_SUDO is not set correctly">&2
+		return 1
+		;;
+	esac
+
+	eval "$KUBECLI_SUDO $(
+		__kubecli_reparse_arguments "$@"
+	)"
+}
+
 # =========================================================================
 
 # +++
@@ -359,33 +386,6 @@ kubecli_grep() {
 __kubecli_reparse_arguments() {
 	[ $# -gt 0 ] || return
 	printf " '%s'" "${@//\'/\'\\\'\'}"
-}
-
-# Construct the command line and run the native kubectl instance. Before
-# running the final command, it checks correctness of sudo-ing and fix
-# the arguments list removing the first argument if it equals exactly
-# to the value "command", which is the shell builtin command.
-
-__kubecli_run_kubectl() {
-	case "$KUBECLI_SUDO" in
-	'' )
-		# No sudo - nothing to do.
-		;;
-	sudo | 'sudo '* )
-		if [ "$1" = "command" ]
-		then
-			shift
-		fi
-		;;
-	* )
-		echo "KUBECLI_SUDO is not set correctly">&2
-		return 1
-		;;
-	esac
-
-	eval "$KUBECLI_SUDO $(
-		__kubecli_reparse_arguments "$@"
-	)"
 }
 
 # Detect and print the position of the first "--" occurrence.
