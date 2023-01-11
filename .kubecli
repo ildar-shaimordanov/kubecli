@@ -391,6 +391,8 @@ kubecli_grep() {
 # Reparse arguments for using with eval.
 
 __kubecli_reparse_arguments() {
+	[ $# -gt 0 ] || return 0
+
 	printf '%s\n' "$@" \
 	| awk -v apos="'" -v bsol="\\\\" -v ORS=" " \
 	'{ gsub(apos, apos bsol apos apos); print apos $0 apos }'
