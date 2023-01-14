@@ -9,16 +9,17 @@
   * [`kubecli`](#kubecli)
 * [COMMANDS](#commands)
   * [`help`](#help)
-  * [`env`](#env)
   * [`names`](#names)
   * [`labels`](#labels)
   * [`tail`](#tail)
   * [`grep`](#grep)
+  * [`ctx`](#ctx)
 * [ENVIRONMENT](#environment)
   * [`KUBECLI_GREP`](#kubecli_grep)
   * [`KUBECLI_NS`](#kubecli_ns)
   * [`KUBECLI_SEL`](#kubecli_sel)
   * [`KUBECLI_SUDO`](#kubecli_sudo)
+  * [`KUBECLI_OLDCTX`](#kubecli_oldctx)
 * [ASSOCIATIONS AND CULTURAL REFERENCES](#associations-and-cultural-references)
 * [REFERENCES](#references)
 * [SEE ALSO](#see-also)
@@ -42,10 +43,9 @@ The `kubecli` project implements the extended management on Kubernetes.
 ## Requirements
 
 * kubectl
-* bash
+* sh
 * grep
 * awk
-* sed
 
 ## Installation
 
@@ -84,17 +84,6 @@ everything is passed to `kubectl`.
 Print the `kubecli` short usage:
 
     kubecli help
-
-
-## `env`
-
-Print any kubernetes related variables or set some of kubecli specific:
-
-    kubecli env [-n NAMESPACE] [-l SELECTOR]
-
-Kubernetes itself uses some environment variables which names
-look like `KUBE*`. This project also adds a few variables named as
-`KUBECLI_*`. See the details in the corresponding section below.
 
 
 ## `names`
@@ -159,6 +148,37 @@ it separates arguments for `kubectl` and `grep`, respectively.
 **Note**: this command is fully supported in BASH only.
 
 
+## `ctx`
+
+Display, use or modify the context:
+
+Display all contexts:
+
+    kubecli ctx -a [OPTIONS]
+    kubectl config get-contexts [OPTIONS]
+
+Display the current context:
+
+    kubecli ctx [.]
+    kubectl config current-context
+
+Use the context:
+
+   kubecli ctx NAME
+   kubectl config use-context NAME
+
+Use the previous context (similar to `cd -` in shells):
+
+    kubecli ctx -
+    kubectl config use-context "$KUBECLI_OLDCTX"
+
+Modify the context:
+
+   kubecli ctx .|NAME OPTIONS
+   kubectl config set-context --current OPTIONS
+   kubectl config set-context NAME OPTIONS
+
+
 # ENVIRONMENT
 
 These variables are used by `kubecli` and `kubectl`. If one of them
@@ -194,6 +214,10 @@ specify the right path to the configuration file):
     KUBECLI_SUDO='sudo -E bash -l'
     KUBECLI_SUDO='sudo --preserve-env=KUBECONFIG'
     KUBECLI_SUDO='sudo KUBECONFIG=/etc/kubernetes/admin.conf'
+
+## `KUBECLI_OLDCTX`
+
+It stores the previously working context.
 
 # ASSOCIATIONS AND CULTURAL REFERENCES
 
