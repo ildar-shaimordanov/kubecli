@@ -29,10 +29,9 @@
 # ## Requirements
 #
 # * kubectl
-# * bash
+# * sh
 # * grep
 # * awk
-# * sed
 #
 # ## Installation
 #
