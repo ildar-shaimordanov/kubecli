@@ -134,7 +134,7 @@ To learn more about the kubectl usage
     kubecli --help
 "
 		;;
-	help | names | labels | tail | grep )
+	help | names | labels | tail | grep | ctx )
 		# pass array as array slimilar to kubecli_$1 "${@:2}"
 		# shellcheck disable=SC2145
 		kubecli_"$@"
@@ -184,6 +184,9 @@ Print log lines matching GREP-OPTIONS:
     kubecli grep [SELECTOR] [OPTIONS] -- GREP-OPTIONS
     kubecli tail [SELECTOR] [OPTIONS] | grep GREP-OPTIONS
     kubectl logs SELECTOR [OPTIONS] | grep GREP-OPTIONS
+
+Display, use or modify the context:
+    kubecli ctx [-a|-|.|NAME] [OPTIONS]
 
 Execute arbitrary kubectl command:
     kubecli [OPTIONS]
@@ -351,6 +354,68 @@ kubecli_grep() {
 
 # =========================================================================
 
+# +++
+#
+# ## `ctx`
+#
+# Display, use or modify the context:
+#
+# Display all contexts:
+#
+#     kubecli ctx -a [OPTIONS]
+#     kubectl config get-contexts [OPTIONS]
+#
+# Display the current context:
+#
+#     kubecli ctx [.]
+#     kubectl config current-context
+#
+# Use the context:
+#
+#    kubecli ctx NAME
+#    kubectl config use-context NAME
+#
+# Use the previous context (similar to `cd -` in shells):
+#
+#     kubecli ctx -
+#     kubectl config use-context "$KUBECLI_OLDCTX"
+#
+# Modify the context:
+#
+#    kubecli ctx .|NAME OPTIONS
+#    kubectl config set-context --current OPTIONS
+#    kubectl config set-context NAME OPTIONS
+#
+# ---
+
+kubecli_ctx() {
+	if [ "$1" = "-a" ]
+	then
+		shift
+		kubectl config get-contexts "$@"
+	elif [ $# -eq 0 ] || { [ $# -eq 1 ] && [ "$1" = "." ] ; }
+	then
+		kubectl config current-context
+	elif [ $# -eq 1 ] && [ "$1" = "-" ]
+	then
+		kubecli_ctx "${KUBECLI_OLDCTX:?value not set}"
+	elif [ $# -eq 1 ]
+	then
+		KUBECLI_OLDCTX="$( kubecli_ctx . )"
+		kubectl config use-context "$1"
+	else
+		if [ "$1" = "." ]
+		then
+			shift
+			set -- "--current" "$@"
+		fi
+
+		kubectl config set-context "$@"
+	fi
+}
+
+# =========================================================================
+
 # Reparse arguments for using with eval.
 
 __kubecli_reparse_arguments() {
@@ -414,6 +479,10 @@ __kubecli_minus_minus_argument_position() {
 #     KUBECLI_SUDO='sudo -E bash -l'
 #     KUBECLI_SUDO='sudo --preserve-env=KUBECONFIG'
 #     KUBECLI_SUDO='sudo KUBECONFIG=/etc/kubernetes/admin.conf'
+#
+# ## `KUBECLI_OLDCTX`
+#
+# It stores the previously working context.
 #
 # # ASSOCIATIONS AND CULTURAL REFERENCES
 #
