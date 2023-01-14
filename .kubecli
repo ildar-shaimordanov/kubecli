@@ -153,7 +153,7 @@ To learn more about the kubectl usage
 #
 # ## `help`
 #
-# Print the `kubecli` short usage:
+# Print the `kubecli` short usage.
 #
 #     kubecli help
 #
@@ -163,42 +163,42 @@ kubecli_help() {
 	echo "\
 kubecli implements extended control over Kubernetes.
 
-Print the kubecli short usage:
+Print the kubecli short usage.
     kubecli help
 
-List the entity names only: any of namespaces, pods, etc:
+List the entity names only: any of namespaces, pods, etc.
     kubecli names NAME [OPTIONS]
     kubectl get NAME -o name [OPTIONS]
 
-Collect the entities and reorder them against the labels they associated:
+Collect the entities and reorder them against the labels they associated.
     kubecli labels NAME [OPTIONS]
     kubectl get NAME [OPTIONS] \\
       --no-headers \\
       -o custom-columns=NAMES:.metadata.name,LABELS:.metadata.labels
 
-Display logs for selected entities:
+Display logs for selected entities.
     kubecli tail [SELECTOR] [OPTIONS]
     kubectl logs SELECTOR [OPTIONS]
 
-Print log lines matching GREP-OPTIONS:
+Print log lines matching GREP-OPTIONS.
     kubecli grep [SELECTOR] [OPTIONS] -- GREP-OPTIONS
     kubecli tail [SELECTOR] [OPTIONS] | grep GREP-OPTIONS
     kubectl logs SELECTOR [OPTIONS] | grep GREP-OPTIONS
 
-Display, use or modify the context:
+Display, use or modify the context.
     kubecli ctx [-a|-|.|NAME] [OPTIONS]
 
-Execute arbitrary kubectl command:
+Execute arbitrary kubectl command.
     kubecli [OPTIONS]
     kubectl [OPTIONS]
 
-Environment variables. If set, have impact as follows:
+Environment variables. If set, have impact as follows.
     KUBECLI_NS    kubectl -n \"\$KUBECLI_NS\" [OPTIONS]
     KUBECLI_SEL   kubectl -l \"\$KUBECLI_SEL\" [OPTIONS]
     KUBECLI_SUDO  sudo [SUDO_OPTIONS] kubectl [OPTIONS]
     KUBECLI_GREP  kubecli grep [OPTIONS]
 
-Follow the next link to learn more about usage:
+Follow the next link to learn more about usage.
     https://github.com/ildar-shaimordanov/kubecli
 "
 }
@@ -209,7 +209,7 @@ Follow the next link to learn more about usage:
 #
 # ## `names`
 #
-# List the entity names only: any of namespaces, pods, etc:
+# List the entity names only: any of namespaces, pods, etc.
 #
 #     kubecli names NAME [OPTIONS]
 #     kubectl get NAME [OPTIONS] -o name
@@ -233,7 +233,7 @@ kubecli_names() {
 # ## `labels`
 #
 # Collect the entities and reorder them against the labels they
-# associated:
+# associated.
 #
 #     kubecli labels NAME [OPTIONS]
 #     kubectl get NAME [OPTIONS] \
@@ -295,7 +295,7 @@ kubecli_labels() {
 #
 # ## `tail`
 #
-# Display logs for selected entities:
+# Display logs for selected entities.
 #
 #     kubecli tail [SELECTOR] [OPTIONS]
 #     kubectl logs SELECTOR [OPTIONS]
@@ -316,7 +316,7 @@ kubecli_tail() {
 #
 # ## `grep`
 #
-# Print log lines matching GREP-OPTIONS:
+# Print log lines matching GREP-OPTIONS.
 #
 #     kubecli grep [SELECTOR] [OPTIONS] -- GREP-OPTIONS
 #     kubecli tail [SELECTOR] [OPTIONS] | grep GREP-OPTIONS
@@ -358,33 +358,33 @@ kubecli_grep() {
 #
 # ## `ctx`
 #
-# Display, use or modify the context:
+# Display, use or modify the context.
 #
-# Display all contexts:
+# Display all contexts.
 #
 #     kubecli ctx -a [OPTIONS]
 #     kubectl config get-contexts [OPTIONS]
 #
-# Display the current context:
+# Display the current context.
 #
 #     kubecli ctx [.]
 #     kubectl config current-context
 #
-# Use the context:
+# Use the context.
 #
 #    kubecli ctx NAME
 #    kubectl config use-context NAME
 #
-# Use the previous context (similar to `cd -` in shells):
+# Use the previous context (similar to `cd -` in shells).
 #
 #     kubecli ctx -
 #     kubectl config use-context "$KUBECLI_OLDCTX"
 #
-# Modify the context:
+# Modify the context.
 #
-#    kubecli ctx .|NAME OPTIONS
-#    kubectl config set-context --current OPTIONS
-#    kubectl config set-context NAME OPTIONS
+#     kubecli ctx .|NAME OPTIONS
+#     kubectl config set-context --current OPTIONS
+#     kubectl config set-context NAME OPTIONS
 #
 # ---
 

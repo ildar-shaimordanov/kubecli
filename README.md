@@ -81,14 +81,14 @@ everything is passed to `kubectl`.
 
 ## `help`
 
-Print the `kubecli` short usage:
+Print the `kubecli` short usage.
 
     kubecli help
 
 
 ## `names`
 
-List the entity names only: any of namespaces, pods, etc:
+List the entity names only: any of namespaces, pods, etc.
 
     kubecli names NAME [OPTIONS]
     kubectl get NAME [OPTIONS] -o name
@@ -100,7 +100,7 @@ with the new function and in the classical way.
 ## `labels`
 
 Collect the entities and reorder them against the labels they
-associated:
+associated.
 
     kubecli labels NAME [OPTIONS]
     kubectl get NAME [OPTIONS] \
@@ -116,7 +116,7 @@ labels in the front of the associated list of pods and other entities.
 
 ## `tail`
 
-Display logs for selected entities:
+Display logs for selected entities.
 
     kubecli tail [SELECTOR] [OPTIONS]
     kubectl logs SELECTOR [OPTIONS]
@@ -128,7 +128,7 @@ this command to monitor pods' log messages.
 
 ## `grep`
 
-Print log lines matching GREP-OPTIONS:
+Print log lines matching GREP-OPTIONS.
 
     kubecli grep [SELECTOR] [OPTIONS] -- GREP-OPTIONS
     kubecli tail [SELECTOR] [OPTIONS] | grep GREP-OPTIONS
@@ -150,33 +150,33 @@ it separates arguments for `kubectl` and `grep`, respectively.
 
 ## `ctx`
 
-Display, use or modify the context:
+Display, use or modify the context.
 
-Display all contexts:
+Display all contexts.
 
     kubecli ctx -a [OPTIONS]
     kubectl config get-contexts [OPTIONS]
 
-Display the current context:
+Display the current context.
 
     kubecli ctx [.]
     kubectl config current-context
 
-Use the context:
+Use the context.
 
    kubecli ctx NAME
    kubectl config use-context NAME
 
-Use the previous context (similar to `cd -` in shells):
+Use the previous context (similar to `cd -` in shells).
 
     kubecli ctx -
     kubectl config use-context "$KUBECLI_OLDCTX"
 
-Modify the context:
+Modify the context.
 
-   kubecli ctx .|NAME OPTIONS
-   kubectl config set-context --current OPTIONS
-   kubectl config set-context NAME OPTIONS
+    kubecli ctx .|NAME OPTIONS
+    kubectl config set-context --current OPTIONS
+    kubectl config set-context NAME OPTIONS
 
 
 # ENVIRONMENT
