@@ -135,7 +135,7 @@ To learn more about the kubectl usage
     kubecli --help
 "
 		;;
-	help | env | names | labels | tail | grep )
+	help | names | labels | tail | grep )
 		# pass array as array slimilar to kubecli_$1 "${@:2}"
 		# shellcheck disable=SC2145
 		kubecli_"$@"
@@ -166,9 +166,6 @@ kubecli implements extended control over Kubernetes.
 
 Print the kubecli short usage:
     kubecli help
-
-Print any kubernetes related variables or set some of kubecli specific:
-    kubecli env [-n NAMESPACE] [-l SELECTOR]
 
 List the entity names only: any of namespaces, pods, etc:
     kubecli names NAME [OPTIONS]
@@ -202,39 +199,6 @@ Environment variables. If set, have impact as follows:
 Follow the next link to learn more about usage:
     https://github.com/ildar-shaimordanov/kubecli
 "
-}
-
-# =========================================================================
-
-# +++
-#
-# ## `env`
-#
-# Print any kubernetes related variables or set some of kubecli specific:
-#
-#     kubecli env [-n NAMESPACE] [-l SELECTOR]
-#
-# Kubernetes itself uses some environment variables which names
-# look like `KUBE*`. This project also adds a few variables named as
-# `KUBECLI_*`. See the details in the corresponding section below.
-#
-# ---
-
-kubecli_env() {
-	[ $# -gt 0 ] || {
-		set | grep '^KUBE[^=]*'
-		return 0
-	}
-
-	while getopts ":n:l:" __kubecli_env_opt
-	do
-		case "$__kubecli_env_opt" in
-		n ) KUBECLI_NS="$OPTARG" ;;
-		l ) KUBECLI_SEL="$OPTARG" ;;
-		: ) echo "Argument required: -$OPTARG" >&2 ;;
-		? ) echo "Illegal option: -$OPTARG" >&2 ;;
-		esac
-	done
 }
 
 # =========================================================================
