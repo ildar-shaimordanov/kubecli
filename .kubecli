@@ -124,8 +124,8 @@ __kubecli_run_kubectl() {
 # ---
 
 kubecli() {
-	case "$1" in
-	'' )
+	if [ $# -eq 0 ]
+	then
 		echo "\
 To learn more about this tool usage
     kubecli help
@@ -133,16 +133,14 @@ To learn more about this tool usage
 To learn more about the kubectl usage
     kubecli --help
 "
-		;;
-	help | names | labels | tail | grep | ctx )
-		# pass array as array slimilar to kubecli_$1 "${@:2}"
+	elif command -v "kubecli_$1" >/dev/null
+	then
+		# pass array as is: call is similar to kubecli_$1 "${@:2}"
 		# shellcheck disable=SC2145
 		kubecli_"$@"
-		;;
-	* )
+	else
 		kubectl ${KUBECLI_NS:+-n "$KUBECLI_NS"} "$@"
-		;;
-	esac
+	fi
 }
 
 # =========================================================================
