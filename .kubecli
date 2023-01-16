@@ -187,16 +187,23 @@ Print log lines matching GREP-OPTIONS.
 
 Display, use or modify the context.
     kubecli ctx [-a|-|.|NAME] [OPTIONS]
+    kubectl config get-contexts [OPTIONS]
+    kubectl config current-context
+    kubectl config use-context NAME
+    kubectl config use-context \"\$KUBECLI_OLDCTX\"
+    kubectl config set-context --current OPTIONS
+    kubectl config set-context NAME OPTIONS
 
 Execute arbitrary kubectl command.
     kubecli [OPTIONS]
     kubectl [OPTIONS]
 
 Environment variables. If set, have impact as follows.
-    KUBECLI_NS    kubectl -n \"\$KUBECLI_NS\" [OPTIONS]
-    KUBECLI_SEL   kubectl -l \"\$KUBECLI_SEL\" [OPTIONS]
-    KUBECLI_SUDO  sudo [SUDO_OPTIONS] kubectl [OPTIONS]
-    KUBECLI_GREP  kubecli grep [OPTIONS]
+    KUBECLI_NS        kubectl -n \"\$KUBECLI_NS\" [OPTIONS]
+    KUBECLI_SEL       kubectl -l \"\$KUBECLI_SEL\" [OPTIONS]
+    KUBECLI_SUDO      sudo [SUDO_OPTIONS] kubectl [OPTIONS]
+    KUBECLI_GREP      kubecli grep [OPTIONS]
+    KUBECLI_OLDCTX    kubecli ctx -
 
 Follow the next link to learn more about usage.
     https://github.com/ildar-shaimordanov/kubecli
@@ -372,8 +379,8 @@ kubecli_grep() {
 #
 # Use the context.
 #
-#    kubecli ctx NAME
-#    kubectl config use-context NAME
+#     kubecli ctx NAME
+#     kubectl config use-context NAME
 #
 # Use the previous context (similar to `cd -` in shells).
 #
@@ -482,7 +489,7 @@ __kubecli_minus_minus_argument_position() {
 #
 # ## `KUBECLI_OLDCTX`
 #
-# It stores the previously working context.
+# It is used to store the previously working context.
 #
 # # ASSOCIATIONS AND CULTURAL REFERENCES
 #
@@ -538,7 +545,7 @@ __kubecli_minus_minus_argument_position() {
 #
 # # LICENSE
 #
-# Copyright 2022, Ildar Shaimordanov
+# Copyright 2022, 2023 Ildar Shaimordanov
 #
 #     MIT License
 #

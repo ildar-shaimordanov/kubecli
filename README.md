@@ -164,8 +164,8 @@ Display the current context.
 
 Use the context.
 
-   kubecli ctx NAME
-   kubectl config use-context NAME
+    kubecli ctx NAME
+    kubectl config use-context NAME
 
 Use the previous context (similar to `cd -` in shells).
 
@@ -217,7 +217,7 @@ specify the right path to the configuration file):
 
 ## `KUBECLI_OLDCTX`
 
-It stores the previously working context.
+It is used to store the previously working context.
 
 # ASSOCIATIONS AND CULTURAL REFERENCES
 
@@ -273,7 +273,7 @@ implementing more interesting features.
 
 # LICENSE
 
-Copyright 2022, Ildar Shaimordanov
+Copyright 2022, 2023 Ildar Shaimordanov
 
     MIT License
 
