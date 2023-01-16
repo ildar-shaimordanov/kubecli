@@ -70,7 +70,7 @@ in the official documentations of each distribution.
 
 It's the real workhorse. It does everything what `kubectl` is able to
 do and also does a bit more. The following section describes extended
-commands supported by `kubecli`.
+commands supplied by `kubecli`.
 
 A command is passed as the first argument. If the argument is recognized
 as the `kubecli` extended command, it is processed internally. Otherwise
@@ -238,7 +238,7 @@ the Tatar word meaning butterfly.
 
 When development became closer to finish and was almost ready for
 publishing I re-read some facts about "Kin-dza-dza!". Pepelats, another
-Plyukanian word meaning a spaceship is originated from the Georgian
+Plyukanian word, meaning a spaceship is originated from the Georgian
 word პეპელა /'pepela/ that is translated as butterfly.
 
 So, the circle has closed! Koo!
