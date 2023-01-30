@@ -164,6 +164,9 @@ kubecli implements extended control over Kubernetes.
 Print the kubecli short usage.
     kubecli help
 
+Print the kubecli full usage.
+    kubecli man
+
 List the entity names only: any of namespaces, pods, etc.
     kubecli names NAME [OPTIONS]
     kubectl get NAME -o name [OPTIONS]
@@ -206,6 +209,34 @@ Environment variables. If set, have impact as follows.
 Follow the next link to learn more about usage.
     https://github.com/ildar-shaimordanov/kubecli
 "
+}
+
+# =========================================================================
+
+# +++
+#
+# ## `man`
+#
+# Print the kubecli full usage.
+#
+#     kubecli man
+#
+# **Note**: this command is fully supported in BASH only.
+#
+# ---
+
+# shellcheck disable=SC2128,SC3028
+kubecli_man() {
+	[ -n "$BASH" ] || {
+		echo "Not supported. Instead use \"kubecli help\"." >&2
+		return 1
+	}
+
+	sed -n '
+	/^# [+]\{3\}$/,/^# [-]\{3\}$/!d
+	/^# [+-]\{3\}$/! s/^# \?//p
+	' "$BASH_SOURCE" \
+	| less
 }
 
 # =========================================================================

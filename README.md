@@ -9,6 +9,7 @@
   * [`kubecli`](#kubecli)
 * [COMMANDS](#commands)
   * [`help`](#help)
+  * [`man`](#man)
   * [`names`](#names)
   * [`labels`](#labels)
   * [`tail`](#tail)
@@ -84,6 +85,15 @@ everything is passed to `kubectl`.
 Print the `kubecli` short usage.
 
     kubecli help
+
+
+## `man`
+
+Print the kubecli full usage.
+
+    kubecli man
+
+**Note**: this command is fully supported in BASH only.
 
 
 ## `names`

@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-kubecli_man() {
-	sed -n '/^# [+][+][+]$/,/^# [-][-][-]$/ {
-		/^# [+][+][+]$/d
-		/^# [-][-][-]$/d
-		s/^# \?//p
-	}'
-}
+. ./.kubecli
 
-exec < .kubecli
-exec > README.md
-
-kubecli_man | git-md-toc -cut
+kubecli_man | git-md-toc -cut > README.md
