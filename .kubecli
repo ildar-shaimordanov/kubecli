@@ -151,7 +151,7 @@ To learn more about the kubectl usage
 #
 # ## `help`
 #
-# Print the `kubecli` short usage.
+# Print brief usage.
 #
 #     kubecli help
 #
@@ -161,10 +161,10 @@ kubecli_help() {
 	echo "\
 kubecli implements extended control over Kubernetes.
 
-Print the kubecli short usage.
+Print brief usage.
     kubecli help
 
-Print the kubecli full usage.
+Print full usage.
     kubecli man
 
 List the entity names only: any of namespaces, pods, etc.
@@ -217,7 +217,7 @@ Follow the next link to learn more about usage.
 #
 # ## `man`
 #
-# Print the kubecli full usage.
+# Print full usage.
 #
 #     kubecli man
 #
@@ -547,9 +547,10 @@ __kubecli_minus_minus_argument_position() {
 # the Tatar word meaning butterfly.
 #
 # When development became closer to finish and was almost ready for
-# publishing I re-read some facts about "Kin-dza-dza!". Pepelats, another
-# Plyukanian word, meaning a spaceship is originated from the Georgian
-# word პეპელა /'pepela/ that is translated as butterfly.
+# publishing I re-read some facts about "Kin-dza-dza!". It recalled me
+# another Plyukanian word, pepelats, meaning a spaceship. It's originated
+# from the Georgian word პეპელა /'pepela/ that is translated
+# as a butterfly.
 #
 # So, the circle has closed! Koo!
 #

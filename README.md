@@ -82,14 +82,14 @@ everything is passed to `kubectl`.
 
 ## `help`
 
-Print the `kubecli` short usage.
+Print brief usage.
 
     kubecli help
 
 
 ## `man`
 
-Print the kubecli full usage.
+Print full usage.
 
     kubecli man
 
@@ -247,9 +247,10 @@ kubecli /kubekli/ sounds almost like күбәләк /kʏbæ'læk/,
 the Tatar word meaning butterfly.
 
 When development became closer to finish and was almost ready for
-publishing I re-read some facts about "Kin-dza-dza!". Pepelats, another
-Plyukanian word, meaning a spaceship is originated from the Georgian
-word პეპელა /'pepela/ that is translated as butterfly.
+publishing I re-read some facts about "Kin-dza-dza!". It recalled me
+another Plyukanian word, pepelats, meaning a spaceship. It's originated
+from the Georgian word პეპელა /'pepela/ that is translated
+as a butterfly.
 
 So, the circle has closed! Koo!
 
