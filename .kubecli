@@ -97,7 +97,7 @@ __kubecli_run_kubectl() {
 		fi
 		;;
 	* )
-		echo "KUBECLI_SUDO is not set correctly">&2
+		echo "KUBECLI_SUDO is not set correctly" >&2
 		return 1
 		;;
 	esac
